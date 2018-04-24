@@ -10,27 +10,10 @@ Here’s a breakdown of how I got up and running below:
 ### Download & Install the WSL
 - Follow the very thorough instructions [here](https://msdn.microsoft.com/en-au/commandline/wsl/install_guide)
 
-### Get your terminal looking pretty pt.1
-- Download Hyper.js [here](https://hyper.is/) - I went with the 'hyperblue' theme.
-
-### Automatically open in Bash
-- Open up Hyper and type `Ctrl` + `,`
-- Scroll down to shell and change it to `C:\\Windows\\System32\\bash.exe`
-
-### Install Zsh
-- Run this `sudo apt-get install zsh`
-- Open your bash profile `nano ~/.bashrc`
-- Add this to set it to use ZSH as default:
-```
-if [ -t 1 ]; then
-exec zsh
-fi
-```
-
 ### Get your terminal looking pretty pt.2
 - Install Oh My Zsh with `sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"`
   - Read docs [here](https://github.com/robbyrussell/oh-my-zsh) on how to add more plugins and change themes (I went with their out of the box 'robbyrussell').
-  
+
 ### Zsh Syntax Highlighting
 This was a late addition but is an amazing add-on to the terminal. Follow the steps [here](https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/INSTALL.md) to get it up and running.
 
@@ -64,6 +47,89 @@ My shell was running slow with nvm so I switched to [n](https://github.com/mklem
 ### Install Gulp CLI
 - Follow the Gulp docs [here](https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md).
 
+
+### Docker
+- Install Docker on windows and Enable "Expose daemon on tcp://localhost:2375"
+
+#### Install Docker within WSL
+```
+# Environment variables you need to set so you don't have to edit the script below.
+export DOCKER_CHANNEL=edge
+export DOCKER_COMPOSE_VERSION=1.21.0
+
+# Update the apt package index.
+sudo apt-get update
+
+# Install packages to allow apt to use a repository over HTTPS.
+sudo apt-get install -y \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+
+# Add Docker's official GPG key.
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+# Verify the fingerprint.
+sudo apt-key fingerprint 0EBFCD88
+
+# Pick the release channel.
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   ${DOCKER_CHANNEL}"
+
+# Update the apt package index.
+sudo apt-get update
+
+# Install the latest version of Docker CE.
+sudo apt-get install -y docker-ce
+
+# Allow your user to access the Docker CLI without needing root.
+sudo usermod -aG docker $USER
+
+# Install Docker Compose.
+sudo curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose &&
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+### Get your terminal looking pretty pt.1
+- Download Hyper.js [here](https://hyper.is/) - I went with the 'hyperblue' theme.
+
+### Automatically open in Bash
+- Open up Hyper and type `Ctrl` + `,`
+- Scroll down to shell and change it to `C:\\Windows\\System32\\bash.exe`
+
+### Install Zsh
+- Run this `sudo apt-get install zsh`
+- Open your bash profile `nano ~/.bashrc`
+- Add this to set it to use ZSH as default:
+```
+if [ -t 1 ]; then
+  exec zsh
+fi
+```
+
+#### Configure WSL to Connect to Docker for Windows
+`echo "export DOCKER_HOST=tcp://0.0.0.0:2375" >> ~/.bashrc && source ~/.bashrc`
+
+#### Bind custom mount points to fix Docker for Windows and WSL differences:
+```
+sudo mkdir /c
+sudo mount --bind /mnt/c /c
+```
+
+It’s worth noting that whenever you run a docker-compose up, you’ll want to make sure you navigate to the /c/Users/nick/dev/myapp location first, otherwise your volume won’t work. In other words, never access /mnt/c directly.
+
+#### Automatically set up the bind mount:
+echo "sudo mount --bind /mnt/c /c" >> ~/.bashrc && source ~/.bashrc
+
+#### Allow your user to bind a mount without a root password:
+`sudo visudo`
+
+`alex ALL=(root) NOPASSWD: /bin/mount #replace alex with your username`
+
+
 ### Aliases
 Just to test out using aliases, I picked a few things I type a lot into the terminal that could save me some keystrokes. Add this to your .zshrc file to do the same and add anything else you see fit:
 ```
@@ -93,7 +159,7 @@ I've recently been getting into Shopify and ran into a bit of a snag when using 
 - Third, paste this into the file then save and exit:
 ```
 #!/bin/sh
-# shell script for shopify theme kit/xdg-open to open browser. 
+# shell script for shopify theme kit/xdg-open to open browser.
 # replace firefox.exe with the browser of your choice.
 cmd.exe /c start firefox.exe $1
 ```
