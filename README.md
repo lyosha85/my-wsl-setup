@@ -32,10 +32,157 @@ autoload -Uz compinit
 compinit
 ```
 
-### Install Git
+
+### Install Chocolatey
+- Follow instuctions https://chocolatey.org/install
+
+### Cmder / ConEmu
+Its a terminal program that serves as excellent replacement for the built-in
+cmd.exe. It's not a shell itself, so it supports running plain old cmd.exe
+commands and running PowerShell.
+
+As a comment notes below, Cmder is actually a packaged version of ConEmu.
+If you don't want the out-of-the-box configuration that Cmder comes with, you
+can install ConEmu by iteslf and customize it to your needs from there.
+Both of course have the same features though.
+
+With Chocolatey, run one of the following from an elevated propt:
+
+`choco install cmder`
+
+or
+
+`choco install conemu`
+
+### Git
+#### Install Git in WSL
 - Run this `sudo apt update`
 - Then run `sudo apt install git`
 
+#### Install Git in Windows
+Git uses a per-user config file located at %USERPROFILE%\.gitconfig. It's a
+plain-text file you can edit with your favorite text editor (or Notepad, if you
+haven't chosen a favorite yet). Note that git calls this config the "global"
+config. It's more general than per-repository config, and more specific than the
+machine config.
+##### TortoiseGit
+
+This is optional, but highly recommended. Download and install TortoiseGit.
+You'll want some of the tools it installs later. If you have another Tortoise
+installed (e.g. TortoiseSVN) and you don't want to have TortoiseGit's context
+menu clutter, you don't have to download it. If you're not sure, get it.
+TortoiseGit is nice because it adds overlay icons (that don't always update
+properly). Another benefit is that a full PuTTY install, which you'll also need.
+
+If you really don't want the extra shell extension (I don't blame you), you can
+install TortoiseGit, copy TortoiseGitPlink.exe from TortoiseGit's bin/
+directory, store it somewhere else, and then uninstall TortoiseGit. Then, later
+on when you set the GIT_SSH environment variable, just use the new path to it.
+
+##### Chocolatey:
+
+`choco install tortoisegit`
+
+##### PuTTY
+You can skip this step if you installed TortoiseGit.
+
+If you didn't install it, download and run the Windows Installer so you get all
+the apps installed from one package.
+
+Chocolatey:
+`choco install putty`
+
+##### Authentication
+
+There are a few different ways to authenticate with GitHub. The easiest is to
+use Git Credential Manager for Windows. It supports authenticating with GitHub
+over HTTPS even with two factor authentication. If you use this, you can skip to
+the "Install Git" section. If you wan to use SSH, read on.
+SSH Setup with PuTTY
+
+If you're using a service like GitHub or Bitbucket, you have a couple of options
+when authenticating so you can push your code. This will allow you to share your
+code with other people. Even if you're the only person working on a project,
+those sites can serve as a backup.
+
+##### Set up SSH keys on Windows:
+
+- Open PuTTYgen by searching for it in the Start menu or Start screen.
+- Leave the settings as they are, unless you know what you're doing.
+- Click "Generate".
+- Wiggle the mouse in the top part of the window until the progress bar is full
+- Once you've provided enough entropy, a bunch of text fields will appear.
+- It's highly recommended that you provide a passphrase (recommended).
+- After providing a passphrase, click "Save private key" in %USERPROFILE%\_ssh\.
+- Call the file in a way that pleases you
+- Log in to GitHub.com. Don't close PuTTYgen yet.
+- Go to your Account settings and then to SSH keys.
+- Click "Add SSH key". Copy the Public key into github and name it
+- Click "Add key".
+
+And with that, we're done setting things up to connect to GitHub.
+
+If you want a native command-line build of ssh (i.e., ssh.exe or ssh-agent.exe)
+to work, you'll need to also export your key in OpenSSH format. You can do this
+from PuTTYgen by clicking on Conversions > Export OpenSSH Key. These keys are
+typically saved in %USERPROFILE%\.ssh or (~/.ssh in *nix-style paths, which also
+work in Bash environments on Windows). Once you export the key, you should copy
+it to `%USERPROFILE%\.ssh\id_rsa`.
+
+##### PoshGit
+
+This is mostly optional if you're using Cmder, but if you want more general
+support for Git in PowerShell, you can install an awesome package called
+posh-git. Because PowerShell is awesome, and you should be using it instead of
+batch scripts and plain old cmd.exe as much as you can. Even without this, you
+can use Git commands from PowerShell, but posh-git will give you status
+information right in the prompt.
+
+- Make sure you have PowerShell 5 or later installed.
+- Open an elevated PowerShell prompt and enter:
+- `Set-ExecutionPolicy RemoteSigned` # Change PowerShell script execution policy
+- `Install Posh-Git`
+- `Install-Module Posh-Git`
+
+Now, whenever you're in a Git workspace directory in your PowerShell prompt,
+you'll get a fancy prompt, and you can still use tab completion and standard
+Windows paths. Hooray! Git will still echo paths with backslashes, but it will
+recognize forward slashes.
+
+##### Config Tweaks
+- Install some git nuggets with: `choco install diffmerge p4merge`
+- Add this to your `.gitconfig`
+```
+[diff]
+    tool = sgdm
+    guitool = sgdm
+[difftool]
+    prompt = false
+[difftool "sgdm"]
+    cmd = "C:/Program\\ Files/SourceGear/Common/DiffMerge/sgdm.exe" --nosplash "\"$LOCAL\"" "\"$REMOTE\""
+    path = "C:/Program\\ Files/SourceGear/Common/DiffMerge/"
+[difftool "p4merge"]
+    cmd = p4merge.exe\"$LOCAL\"\"$REMOTE\"
+[merge]
+    tool = p4merge
+[mergetool]
+    keepBackup = false
+    prompt = false
+[mergetool "sgdm"]
+    cmd = "C:/Program\\ Files/SourceGear/Common/DiffMerge/sgdm.exe" --nosplash --merge --result="\"$PWD/$MERGED\"" "\"$PWD/$LOCAL\"" "\"$PWD/$BASE\""
+    trustExitCode = true
+    prompt = false
+[mergetool "p4merge"]
+    cmd = "p4merge.exe" "\"$BASE\"" "\"$LOCAL\"" "\"$REMOTE\"" "\"$MERGED\""
+    keepTemporaries = false
+    trustExitCode = true
+```
+### VSCode
+- Install VSCode
+- Get linux eol with this setting:
+```
+    "files.eol": "\n",
+```
 ### Setup a SSH key and link to your Github
 - Follow the Linux steps [here](https://help.github.com/articles/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent/#platform-linux) to create a key and add it to your SSH agent
 - Then type `cat ~/.ssh/id_rsa.pub`
@@ -92,7 +239,6 @@ sudo usermod -aG docker $USER
 sudo curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose &&
 sudo chmod +x /usr/local/bin/docker-compose
 ```
-
 ### Get your terminal looking pretty pt.1
 - Download Hyper.js [here](https://hyper.is/) - I went with the 'hyperblue' theme.
 
