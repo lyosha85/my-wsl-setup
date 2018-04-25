@@ -14,6 +14,11 @@ Here’s a breakdown of how I got up and running below:
 - Install Oh My Zsh with `sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"`
   - Read docs [here](https://github.com/robbyrussell/oh-my-zsh) on how to add more plugins and change themes (I went with their out of the box 'robbyrussell').
 
+### direnv -- Unclutter your .profile
+direnv is an environment switcher for the shell. It knows how to hook into bash, zsh, tcsh, fish shell and elvish to load or unload environment variables depending on the current directory. This allows project-specific environment variables without cluttering the ~/.profile file.
+
+Follow instructions: https://github.com/direnv/direnv
+
 ### Zsh Syntax Highlighting
 This was a late addition but is an amazing add-on to the terminal. Follow the steps [here](https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/INSTALL.md) to get it up and running.
 
