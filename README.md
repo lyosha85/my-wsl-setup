@@ -273,7 +273,13 @@ sudo mount --bind /mnt/c /c
 It’s worth noting that whenever you run a docker-compose up, you’ll want to make sure you navigate to the /c/Users/nick/dev/myapp location first, otherwise your volume won’t work. In other words, never access /mnt/c directly.
 
 #### Automatically set up the bind mount:
-echo "sudo mount --bind /mnt/c /c" >> ~/.bashrc && source ~/.bashrc
+cat <<EOT >> ~/.bashrc
+# Mount c for docker volumes
+if [ ! -d "/c" ]; then
+  sudo mount --bind /mnt/c /c
+fi
+EOT
+source ~/.bashrc
 
 #### Allow your user to bind a mount without a root password:
 `sudo visudo`
